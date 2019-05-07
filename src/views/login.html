@@ -1,28 +1,32 @@
-<section>
-  <section id="buttons-section" class=" container mt-3">
-    <button id="btn-email" type="button" class="btn btn-outline-secondary btn-block" onclick="library.getController().showFormLogin()"><i class="fas fa-envelope"></i> Correo electrónico</button>
-  </section>
+<div id="count-btn-log">
+    <section>
+        <section id="buttons-section" class=" container mt-3">
+          <button id="btn-email" type="button" class="btn btn-outline-secondary btn-block" onclick="library.getController().showFormLogin()"><i class="fas fa-envelope"></i> Correo electrónico</button>
+        </section>
+      
+        <section id="login-section" class="container hidden mt-4">
+          <div class="row">
+            <form id="login-form" class="w-50 mx-auto p-3 bg-ligth rounded border border-light border-bottom mt-3">
+              <h5>Accede a tu cuenta</h5>
+              <div class="form-group">
+                <input id="email_sing_in" class="form-control" type="email" name="yourEmail" placeholder="Email">
+              </div>
+              <div class="form-group">
+                <input id="password_sing_in" class="form-control" type="password" placeholder="Contraseña">
+              </div>
+              <button id="logIn-button" type="button" class="btn btn-primary" onclick="library.getController().logIn(library.get('login-form'))">Entrar</button>
+            </form>
+          </div>
+        </section>
+      
+        <div class="mt-4"></div>
+        <section class="d-flex justify-content-center">
+          <button id="btn-google" class="btn btn-light" onclick="library.getController().googleSigIn()">
+            <span class="icon-google"><img class="icon-google" alt="" src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"></span>
+            <span class="text-long">Sign in with Google</span>
+          </button>
+        </section>
+      </section>
+      
 
-  <section id="login-section" class="container hidden mt-4">
-    <div class="row">
-      <form id="login-form" class="w-50 mx-auto p-3 bg-ligth rounded border border-light border-bottom mt-3">
-        <h5>Accede a tu cuenta</h5>
-        <div class="form-group">
-          <input id="email_sing_in" class="form-control" type="email" name="yourEmail" placeholder="Email">
-        </div>
-        <div class="form-group">
-          <input id="password_sing_in" class="form-control" type="password" placeholder="Contraseña">
-        </div>
-        <button id="logIn-button" type="button" class="btn btn-primary" onclick="library.getController().logIn(library.get('login-form'))">Entrar</button>
-      </form>
     </div>
-  </section>
-
-  <div class="mt-4"></div>
-  <section class="d-flex justify-content-center">
-    <button id="btn-google" class="btn btn-light" onclick="library.getController().googleSigIn()">
-      <span class="icon-google"><img class="icon-google" alt="" src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"></span>
-      <span class="text-long">Sign in with Google</span>
-    </button>
-  </section>
-</section>

@@ -2,7 +2,7 @@
   let isEditable = false;
   let d = new Date(); //obtener fecha
   let fechaHoy = d.getDate() + "/" + (d.getMonth() + 1) + "/" + d.getFullYear() + " " + d.getHours() + ":" + d.getMinutes() + ":" + d.getSeconds();
-  let idBtn;
+
   library.controller('enter', {
 
     showFormLogin: function() {
@@ -28,22 +28,14 @@
       if (checkPasswords) {
         firebase.auth().createUserWithEmailAndPassword(email, password)
           .then(function(result) {
-            console.log(result)
             window.location.hash = '#/editprofile';
             result = window.redSocial.checkEmail()
             return result
           })
           .then(function(response) {
-            console.log(response);
-            //parse json to create a js object
+
             response = response.json;
-            //get a user object inside the response object
-            const user = response.user;
-            //Save the data for the current User
-            let userData = {
-              id: user.uid,
-              email: user.email,
-            }
+
           })
           .catch(function(error) {
             // Handle Errors here.
@@ -72,7 +64,6 @@
       firebase.auth().signInWithEmailAndPassword(emailSingIn, passwordSingIn)
         .then(function() {
 
-          console.log('userSigIn')
           let userSigIn = window.redSocial.obtainUser();
           if (userSigIn.emailVerified) {
             window.location.hash = '#/editprofile';
@@ -94,6 +85,7 @@
         if (user) {
           console.log('hay usuario')
           if(location.href.includes('editprofile')){
+            const postButton = library.get('add-btn');
             library.getController().printData();
             var displayName = user.displayName;
             if (displayName == null) {
@@ -105,10 +97,15 @@
               photoURL = user.photoURL;
             }
 
+
             const photoDefault = library.get('cliente-photo');
             const userNameField = library.get('user-name');
             photoDefault.setAttribute("src", photoURL);
             userNameField.value = displayName;
+
+            postButton.addEventListener('click', () => {
+              library.getController().addPost();
+              })
 
           }else if(location.href.includes('wall')){
             library.getController().printWall();
@@ -126,7 +123,7 @@
       isEditable = !isEditable;
       if (isEditable) {
         userNameField.readOnly = false;
-        editButton.innerHTML = 'Save';
+        editButton.innerHTML = `<i class="far fa-save"></i> Save`;
       } else {
         firebase.auth().currentUser.updateProfile({
             displayName: userNameField.value
@@ -138,17 +135,16 @@
             alert('something went wrong');
           })
         userNameField.readOnly = true;
-        editButton.innerHTML = 'Edit';
+        editButton.innerHTML = `<i class="far fa-edit"></i> Editar Nombre`;
       }
     },
 
     addPost: function() {
-
       const postField = document.getElementById('post-field');
       const user = firebase.auth().currentUser;
       const privacyField = document.getElementById('privacy');
       const isPublic = privacyField.options[privacyField.selectedIndex].value;
-      if (postField.value != null) {
+      if (postField.value != null || postField.value != '') {
         db.collection("posts").doc(user.uid).set({
             userId: user.uid
           })
@@ -158,12 +154,21 @@
           .catch(function(error) {
             console.error("Error writing document: ", error);
           });
+
+        let userNamePost;
+        if (user.displayName == null) {
+          userMail = user.email.split('@');
+          userNamePost = userMail[0];
+        }
+        else {
+          userNamePost = user.displayName;
+        }
         db.collection("posts").doc(user.uid).collection('private_post').add({
-            userName: user.displayName,
+            userName: userNamePost,
             message: postField.value,
             time: fechaHoy,
             isPublic: isPublic,
-            likes: 0,
+            likes: [],
             comments: []
           })
 
@@ -192,8 +197,8 @@
                   <h5 class="card-title">${doc.data().userName}</h5>
                   <h6 class="card-subtitle mb-2 text-muted">${doc.data().time}</h6>
                   <textarea id="message${doc.id}" class="form-control" readOnly>${doc.data().message}</textarea><br>
-                  <button id="edit-button${doc.id}" class="btn btn-primary" type="submit"><i id="icon${doc.id}" class="far fa-edit"></i></button>
-                  <button id="delete-button${doc.id}" class="btn btn-primary" type="submit"><i class="far fa-trash-alt"></i></button>
+                  <button id="edit-button${doc.id}" class="btn btn-warning" type="submit"><i id="icon${doc.id}" class="far fa-edit"></i></button>
+                  <button id="delete-button${doc.id}" class="btn btn-danger" type="submit"><i class="far fa-trash-alt"></i></button>
                 </div>
               </div>
             </td>
@@ -230,7 +235,9 @@
               likes: firebase.firestore.FieldValue.arrayRemove(userCurrent.uid)
             }).then(function(){
               console.log('el like se eliminó');
-              labelLike.innerText = ((likesArray.length - 1) > 0) ? (likesArray.length - 1) : '';
+              let tabla = library.get('tabla');
+              tabla.innerHTML = '';
+              library.getController().printWall();
             });
           }
           else{
@@ -239,7 +246,6 @@
               likes: firebase.firestore.FieldValue.arrayUnion(userCurrent.uid)
             }).then(function(){
               console.log('el like se agregó');
-              labelLike.innerText = ((likesArray.length + 1) > 0) ? (likesArray.length + 1) : '';
             });
           }
         });
@@ -248,7 +254,9 @@
           likes: firebase.firestore.FieldValue.arrayUnion(userCurrent.uid)
         }).then(function(){
           console.log('el like se agregó');
-          labelLike.innerText = ((likesArray.length + 1) > 0) ? (likesArray.length + 1) : '';
+          let tabla = library.get('tabla');
+          tabla.innerHTML = '';
+          library.getController().printWall();
         });
       }
     },
@@ -256,37 +264,44 @@
     printWall: function() {
       let tabla = library.get('tabla');
       tabla.innerHTML = '';
-      db.collection('posts').get().then(function(querySnapshot) {
+      db.collection('posts').onSnapshot(function(querySnapshot) {
         querySnapshot.forEach(function(docMain) {
           console.log(docMain.id, " => ", docMain.data());
           db.collection('posts').doc(docMain.data().userId).collection('private_post').orderBy('time', 'desc').limit(10).onSnapshot((querySnapshot) => {
             querySnapshot.forEach((doc) => {
               console.log(`${doc.id}=>${doc.data()}`);
-              const likesCount = (doc.data().likes.length > 0) ? doc.data().likes.length : '';
-              // console.log(doc.data().likes[0]);
-              let messages = `
-                <tr>
-                  <td>
-                    <div class="card">
-                      <div class="card-body">
-                        <h5 class="card-title">${doc.data().userName}</h5>
-                        <h6 class="card-subtitle mb-2 text-muted">${doc.data().time}</h6>
-                        <textarea id="message${doc.id}" class="form-control" readOnly>${doc.data().message}</textarea><br>
-                        <button id="like${doc.id}" class="btn btn-primary" type="button"><i class="fab fa-gratipay"></i></button>
-                        <label id="likes-label${doc.id}">${likesCount}</label>
+              if(doc.data().isPublic === 'true'){
+                const likesCount = (doc.data().likes.length > 0) ? doc.data().likes.length : '';
+                let messages = `
+                  <tr>
+                    <td>
+                      <div class="card">
+                        <div class="card-body">
+                          <h5 class="card-title">${doc.data().userName}</h5>
+                          <h6 class="card-subtitle mb-2 text-muted">${doc.data().time}</h6>
+                          <textarea id="message${doc.id}" class="form-control" readOnly>${doc.data().message}</textarea><br>
+                          <button id="like${doc.id}" class="btn btn-primary" type="button"><i class="fab fa-gratipay"></i></button>
+                          <label id="likes-label${doc.id}">${likesCount}</label>
+                        </div>
                       </div>
-                    </div>
-                  </td>
-                </tr>
-                `;
-              tabla.insertAdjacentHTML("beforeend", messages);
-              library.getController().eventLike(doc.id, docMain.data().userId, doc.data().likes);
-              library.getController().gotUserLike(doc.id, doc.data().likes);
+                    </td>
+                  </tr>
+                  `;
+                tabla.insertAdjacentHTML("beforeend", messages);
+                library.getController().eventLike(doc.id, docMain.data().userId, doc.data().likes);
+                library.getController().gotUserLike(doc.id, doc.data().likes);
+              }
             })
           })
         });
       });
+
     },
+
+    addPostWall: function(){
+     library.getController().addPost();
+     library.getController().printWall();
+   },
 
     updatePost: function(userId, docId) {
       const button = library.get('edit-button' + docId);
@@ -326,6 +341,7 @@
 
     confirmDelete: (userId, docId) => {
       if (confirm('¿Estas seguro de eliminar este post?')) {
+
         library.getController().deletePost(userId, docId);
       }
     },
@@ -350,7 +366,7 @@
       let tabla = library.get('tabla');
       likeButoon.addEventListener('click', () => {
         library.getController().likes(docId, userIdPost, likesArray);
-        tabla.innerHTML = '';
+
       })
     },
 
@@ -364,7 +380,6 @@
 
     googleSigIn: function() {
       var provider = new firebase.auth.GoogleAuthProvider();
-      provider.addScope('https://www.googleapis.com/auth/contacts.readonly');
       firebase.auth().signInWithPopup(provider)
         .then(function(result) {
           var token = result.credential.accessToken;

@@ -1,28 +1,39 @@
-<section>
 
-    <section class="conta-btnall">
-       <button type="button" id="wall-button" onclick="library.getController().goWall()">Muro</button>
+<ul class="nav nav-tabs justify-content-end">
+    <li class="nav-item">
+      <a id="edit_button" class="nav-link" role="button" onclick="library.getController().editUser()"><i class="far fa-edit"></i>Editar nombre</a>
+    </li>
+    <li class="nav-item">
+      <a id="wall-button"  class="nav-link"role="button" onclick="library.getController().goWall()"><i class="fas fa-users"></i> Muro</a>
+    </li>
+    <li class="nav-item">
+      <a id="signOut-button" class="nav-link" role="button" onclick="window.redSocial.signOut()"><i class="fas fa-sign-out-alt"></i> Salir</a>
+    </li>
+  </ul>
 
-</section>
+<div id= "counter-profile">
+      <section class="count-name">
+        <section >
+          <img id="cliente-photo" class="img-responsive"  data-toggle="dropdown"  ></img>
+        </section>
+        <input id="user-name" type="text" name="user-name" readonly>
+      </section>
+  </div>
 
-  <section class="text-center">
-    <img class="img-thumbnail" id="cliente-photo" style="width: 200px;">
-    <button type="button" id="edit_button" onclick="library.getController().editUser()">Edit</button>
-    <h3>Bienvenido</h3>
-    <input id="user-name" type="text" name="user-name" readonly>
-  </section>
 
-  <section id="wall">
-    <label for="message">Estado</label>
+
+<div id="count-post">
+ <section id="wall">
+    <h4> <label for="message">Estado</label> </h4>
     <h3><span id="user-name"></span></h3>
     <textarea id="post-field" class="form-control" name="message"></textarea>
-    <button id="add-btn" type="button" onclick="library.getController().addPost()">Publicar</button>
-    <select id="privacy" name="privacy">
-    <option value="true">Publico
-    <option value="false">Privado
+    <button id="add-btn" class ="btn btn-light btn-outline-primary btn-sm ml-2 mt-2" type="button">Publicar</button>
+    <select id="privacy" class="btn btn-light btn-sm ml-2 mt-2" name="privacy">
+    <option value="true">Publico</option>
+    <option value="false">Privado</option>
     </select>
     <!-- <section id="posts" class="card text-center"> -->
-    <table class="table">
+    <table class="table mt-2">
       <thead>
         <tr>
           <th scope="col">Posts</th>
@@ -33,4 +44,4 @@
       </tbody>
     </table>
   </section>
-</section>
+</div>

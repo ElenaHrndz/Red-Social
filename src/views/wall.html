@@ -1,19 +1,38 @@
-<section>
+<div id="counter-wall">
+  <ul class="nav justify-content-end">
+    <li class="nav-item">
+      <a id="profile_button" class="dropdown-item" role="button" onclick="library.getController().backPerfil()"><i class="far fa-user"></i> Mi perfil</a>
+    </li>
+    <li><a>|</a></li>
 
-  <section class="conta-btnall">
-   <button type="button" id="profile_button" onclick="library.getController().backPerfil()">Mi perfil</button>
-    </section>
+    <li>
+      <a id="signOut-button" class="dropdown-item" role="button" onclick="window.redSocial.signOut()"><i class="fas fa-sign-out-alt"></i> Salir</a>
+
+    </li>
+  </ul>
+
+</div>
 
 
+<div id="wall-all">
+  <h2>Bienvenido al muro escolar</h2>
+</div>
 
+<div id="count-post">
   <section id="wall">
-    <h2>Bienvenido al muro escolar</h2>
-
+    <h4> <label for="message">Estado</label> </h4>
+    <h3><span id="user-estado"></span></h3>
+    <textarea id="post-field" class="form-control" name="message"></textarea>
+    <button id="add-btn" class="btn btn-light btn-outline-primary btn-sm ml-2 mt-2" type="button" onclick="library.getController().addPostWall()">Publicar</button>
+    <select id="privacy" class="btn btn-light btn-sm ml-2 mt-2" name="privacy">
+      <option value="true">Publico</option>
+      <option value="false">Privado</option>
+    </select>
     <!-- <section id="posts" class="card text-center"> -->
-    <table class="table">
+    <table class="table mt-2">
       <thead>
         <tr>
-          <th scope="col">Posts</th>
+          <th class="post-profile" scope="col"></th>
         </tr>
       </thead>
       <tbody id="tabla">
@@ -21,4 +40,17 @@
       </tbody>
     </table>
   </section>
-</section>
+</div>
+
+<div id="posts-wall">
+  <table class="table">
+    <thead>
+      <tr>
+        <th scope="col">Posts</th>
+      </tr>
+    </thead>
+    <tbody id="tabla">
+
+    </tbody>
+  </table>
+</div>
